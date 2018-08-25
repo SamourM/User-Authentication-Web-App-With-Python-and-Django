@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .forms import SignUpForm
 
 
@@ -26,8 +26,6 @@ def login_user(request):
         return render(request,'authenticate/login.html',{})
 
 
-
-
 def logout_user(request):
     logout(request)
     messages.success(request,('You Have Been Logged Out!'))
@@ -49,3 +47,17 @@ def register_user(request):
         form = SignUpForm()
     context = {'form': form}
     return render(request,'authenticate/register.html', context)
+
+
+def edit_profile(request):
+    if request.method == 'POST':
+        form = UserChangeForm(request.POST , instance = request.user)
+        if form.is_valid():
+            form.save()
+            
+            messages.success(request,('You Have Edited Your Profile'))
+            return redirect('home')
+    else:
+        form = UserChangeForm(instance = request.user)
+    context = {'form': form}
+    return render(request,'authenticate/edit_profile.html', context)
